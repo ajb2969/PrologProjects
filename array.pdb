@@ -1,0 +1,62 @@
+%Author: Alex Brown
+
+array(0,_,[]).%base case for size zero
+array(1,Val,[Val]). %base case for one element
+array(Size,InitVal,Arr):-%based case for 2 or n-more elements
+    NewS is Size - 1,
+    array(NewS, InitVal, InitValArr),%makes list for next value
+    append(InitValArr, [InitVal], Arr),!.%concatenates subLists together
+
+double(X,Y):- Y is X * 2.%test function for map
+
+
+
+array_len([],0). %base case with empty list
+array_len([_|T], Len):- 
+        array_len(T,New), % recurses on rest of list
+        Len is New + 1. %adds one to recursive call
+
+
+index(0,[H|_],H). %matches head with val
+index(Ind,[_|T],Val):-
+    index(Newi,T,Val),%finds index based upon the rest of the list
+    Ind is Newi + 1.
+    
+
+set_index(0, [_|T], Newval, [Newval|T]).%appends new value to list as it's
+%rebuilt
+set_index(Ind,[H|T],Val,NewArr):-
+    NewInd is Ind - 1,
+    set_index(NewInd,T,Val,Changed),%looking for index and recurses on tail
+    append([H], Changed, NewArr).%appends base case list to every "head"
+
+map(_,[],[]).%base case
+map(Proc, [H|T], Newarr):-
+    call(Proc, H, Newele), %calls the Procedure on head of curr recursive call
+    map(Proc,T,Newarr1),%calls map on the tail 
+    append([Newele],Newarr1, Newarr),!. %appends changed element to returnedarr
+
+matrix(0,_,_,[]). % base case
+matrix(Row,Col,InitVal,Mat):-
+    array(Col,InitVal,Arr), %creates new row with initial val
+    R is Row - 1,
+    matrix(R,Col,InitVal,Othermat), %recursively makes matrix with Row - 1 rows
+    append([Arr],Othermat, Mat). %appends generated arrays together
+    
+num_rows([],0).
+num_rows([_|T],Rows):-
+    num_rows(T,Row),%
+    Rows is Row + 1. %adds 1 to Rows per recursive call
+    
+
+num_cols([H|_], Column) :-
+    array_len(H,Answer), %gets the length of first row in matrix
+    Column =  Answer.
+
+index(Row,Col,Mat,Val) :-
+    index(Row,Mat,Goodrow), % gets row from Row var
+    index(Col,Goodrow,Trueval),% searches for val in row from prior call
+    Val =  Trueval. %returns the value from second index call
+    
+    
+    
